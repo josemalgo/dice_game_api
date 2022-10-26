@@ -11,10 +11,6 @@ const playerSchema = new Schema({
     password: {
         type: String
     },
-    registerDate: {
-        type: Date, 
-        default: Date.now
-    },
     succesRate : {
         type: Number,
         default: 0.00

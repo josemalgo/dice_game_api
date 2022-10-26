@@ -1,4 +1,4 @@
-import { mongoConfig } from "./config/config.js";
+import { mongoConfig, serverConfig } from "./config/config.js";
 import mongoose from "mongoose";
 import app from "./app.js";
 
@@ -8,7 +8,7 @@ async function main() {
     
     try {
         mongoose.connect(uri);
-        app.listen(mongoConfig.DB_PORT);
+        app.listen(serverConfig.PORT);
         console.log("Server is listening on port", 3000);
     } catch (error) {
         console.error("Unable to connect to the database: ", error);
