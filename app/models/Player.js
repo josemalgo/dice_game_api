@@ -2,10 +2,8 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const playerSchema = new Schema({
-    _id: Schema.Types.ObjectId,
     name: {
         type: String,
-        unique: true,
         default: "ANÒNIM"
     },
     password: {
@@ -16,6 +14,8 @@ const playerSchema = new Schema({
         default: 0.00
     },
     games: [{ type: Schema.Types.ObjectId, ref: "Game"}]
+}, {
+    timestamps: true
 });
 
 export const Player = mongoose.model('Player', playerSchema);

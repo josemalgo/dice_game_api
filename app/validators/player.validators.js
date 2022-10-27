@@ -1,4 +1,5 @@
 import { check } from "express-validator";
+import { Player } from "../models/Player.js";
 
 export const createPlayer = [
     check("name")
@@ -19,3 +20,12 @@ export const updatePlayer = [
         .isMongoId()
 ];
 
+export const duplicatePlayerName = async (name) => {
+
+    const existName = await Player.findOne({ name: name })
+    if (existName) {
+        return true;
+    }
+
+    return false;
+}

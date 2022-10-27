@@ -5,16 +5,8 @@ export const getAllPlayers = async () => {
     return allPlayers;
 }
 
-export const addPlayer = async (body) => {
-    const { name, password } = body;
-
-    const player = await Player.create({
-        name,
-        password
-    });
-
+export const addPlayer = async (player) => {
     await player.save();
-
     return player;
 }
 
