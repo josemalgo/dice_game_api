@@ -4,7 +4,6 @@ const { Schema } = mongoose;
 const playerSchema = new Schema({
     name: {
         type: String,
-        default: "ANÒNIM"
     },
     password: {
         type: String

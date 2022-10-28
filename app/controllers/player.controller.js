@@ -1,7 +1,6 @@
 import { Player } from "../models/Player.js";
 import * as playerService from "../services/player.service.js"
 import { validationResult } from "express-validator";
-import { duplicatePlayerName } from "../validators/player.validators.js";
 import mongoose from "mongoose";
 
 export const getPlayers = async (req, res) => {
@@ -19,25 +18,18 @@ export const getPlayer = async (req, res) => {
 }
 
 export const createPlayer = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+
+    if(req.body.name !== "") {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
     }
 
     const { name, password } = req.body;
-    const existName = duplicatePlayerName(name);
-    if(existName) {
-        return res.status(422).json({ error: "Name duplicate!" });
-    }
 
     try {
-
-        const newPlayer = await Player.create({
-            name,
-            password
-        });
-        
-        const player = await playerService.addPlayer(newPlayer);
+        const player = await playerService.addPlayer(name, password);
         res.status(201).json(player);
     } catch (error) {
         return res.status(500).json({ message: error.message });
