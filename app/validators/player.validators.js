@@ -1,23 +1,15 @@
 import { check } from "express-validator";
 import { Player } from "../models/Player.js";
 
-export const createPlayer = [
+export const playerName = [
     check("name")
         .trim()
         .escape()
         .not()
         .isEmpty()
         .isString()
-        .isAlphanumeric()
-];
-
-export const updatePlayer = [
-    check("_Id")
-        .trim()
-        .escape()
-        .not()
-        .isEmpty()
-        .isMongoId()
+        //.isAlphanumeric()
+        .matches("^[a-zA-Z\u00C0-\u00FF]*$")
 ];
 
 export const duplicatePlayerName = async (name) => {
