@@ -20,6 +20,7 @@ export const addGame = async(id, roll) => {
 
         newGame.save(async () => {
 
+            player.succesRate = calculateSuccesRate(player, win);
             player.games.push(newGame);
 
             await player.save();
@@ -38,4 +39,17 @@ const winGame = (roll) => {
     }
 
     return false;
-}
+};
+
+const calculateSuccesRate = (player, win) => {
+    const totalWin = win ? 1 : 0;
+    
+    player.games.forEach(game => {
+        if(game.win) totalWin++;
+    });
+
+    if(totalWin === 0) {
+        return 0;
+    }
+    return player.games.length / totalWin;
+};
