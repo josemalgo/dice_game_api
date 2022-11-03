@@ -1,9 +1,12 @@
 import { Game } from "../models/Game.js";
 import { Player } from "../models/Player.js";
+import { 
+    calculateSuccesRate,
+    addGameToPlayer } from "./player.service.js";
 
-export const addGame = async(id, roll) => {
+export const addGame = async (id, roll) => {
     const player = await Player.findById(id)
-    if(!player) {
+    if (!player) {
         const error = new Error();
         error.code = 422;
         throw error;
@@ -18,38 +21,22 @@ export const addGame = async(id, roll) => {
             win
         });
 
-        newGame.save(async () => {
-
-            player.succesRate = calculateSuccesRate(player, win);
-            player.games.push(newGame);
-
-            await player.save();
-        });
+        await newGame.save();
+        await addGameToPlayer(player, newGame);
+        await calculateSuccesRate(id);
 
         return newGame;
     } catch (error) {
+        console.log(error);
         throw error;
     }
 };
 
 const winGame = (roll) => {
     const result = roll[0] + roll[1];
-    if(result === 7) {
+    if (result === 7) {
         return true;
     }
 
     return false;
-};
-
-const calculateSuccesRate = (player, win) => {
-    const totalWin = win ? 1 : 0;
-    
-    player.games.forEach(game => {
-        if(game.win) totalWin++;
-    });
-
-    if(totalWin === 0) {
-        return 0;
-    }
-    return player.games.length / totalWin;
 };
