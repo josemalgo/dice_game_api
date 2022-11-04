@@ -2,8 +2,13 @@ import { Player } from "../models/Player.js";
 import { duplicatePlayerName } from "../validators/player.validators.js";
 
 export const getAllPlayers = async () => {
-    const allPlayers = await Player.find({}, { name: 1, succesRate: 1, games: 1 });
-    return allPlayers;
+    try {
+        const allPlayers = await Player.find({}, { name: 1, successRate: 1, games: 1 });
+        return allPlayers;    
+    } catch (error) {
+        throw error;
+    }
+    
 }
 
 export const addPlayer = async (name, password) => {
@@ -58,37 +63,20 @@ export const updatePlayer = async (id, changes) => {
         throw error;
     }
 
-}
+};
 
-export const calculateSuccesRate = async (id) => {
-    let totalWin = 0;
-    let totalGames = 0;
-    let successRate = 0;
-
-    const player = await Player.findById(id).populate("games");
-    player.games.forEach(game => {
-        if (game.win) totalWin++;
-    });
-
-    totalGames = player.games.length;
-
-    successRate = totalWin / totalGames * 100
-
+export const updateSuccessRate = async(id, newValue) => {
+    const player = await Player.findById(id);
+    if (!player) {
+        const error = new Error("The id does not exist.");
+        error.code = 402;
+        throw error;
+    }
+    
     try {
-        player.succesRate = successRate;
+        player.set("successRate", newValue);
         await player.save();
     } catch (error) {
         throw error;
     }
 };
-
-export const addGameToPlayer = async (player, newGame) => {
-
-    try {
-        player.games.push(newGame);
-        await player.save();
-    } catch (error) {
-        throw error;
-    }
-
-}

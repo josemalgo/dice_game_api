@@ -1,10 +1,21 @@
 import mongoose from "mongoose";
 import { validationResult } from "express-validator";
 import * as gameService from "../services/game.service.js";
-import { Player } from "../models/Player.js";
+import { Game } from "../models/Game.js";
 
 export const getGames = async ( req, res ) => {
+    
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status( 422 ).json( { error: "Invalid ObjectID" } );
+    }
 
+    try {
+        const games = await gameService.getGamesByPlayerId(id)
+        res.status(200).json(games);    
+    } catch (error) {
+        return res.status( 500 ).json( { message: error.message } );
+    }
 }
 
 export const addGame = async ( req, res ) => {
@@ -41,9 +52,7 @@ export const deleteGames = async ( req, res ) => {
 
     try {
         const gamesDeleted = await gameService.deleteGames( id );
-        const player = await Player.findById(id).populate("games");
-        player.games;
-        console.log(player.games);
+        await play.save()
         res.status( 200 ).json(gamesDeleted);
     } catch ( error ) {
         return res.status( 500 ).json( { message: error.message } );

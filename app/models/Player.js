@@ -8,11 +8,10 @@ const playerSchema = new Schema({
     password: {
         type: String
     },
-    succesRate : {
+    successRate : {
         type: Number,
         default: 0.00
-    },
-    games: [{ type: Schema.Types.ObjectId, ref: "Game"}]
+    }
 }, {
     timestamps: true
 });
