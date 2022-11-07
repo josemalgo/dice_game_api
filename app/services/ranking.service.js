@@ -2,8 +2,14 @@ import { Player } from "../models/Player.js";
 
 export const getRanking = async () => {
     try {
-        const ranking = await Player.find({}).sort({"succesRate": -1})
-        const average = await calculateAveregeSuccessRate();
+        const ranking = await Player.find({}).sort({ successRate: -1});
+        const average = await Player.aggregate()
+            .group(
+            {
+                _id: null,
+                average: {$avg: "$successRate"}
+            }
+        );
         return {ranking, average};
     } catch (error) {
         throw error;
@@ -11,28 +17,21 @@ export const getRanking = async () => {
 };
 
 export const getLooser = async() => {
+    try {
+        const looser = await Player.find({}).sort({ successRate: 1}).limit(1);
 
+        return looser;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const getWinner = async() => {
+    try {
+        const winner = await Player.find({}).sort({ successRate: -1}).limit(1);
 
-};
-
-const calculateAveregeSuccessRate = async () => {
-    let totalPlayers = 0;
-    let sumAllSuccesRate = 0;
-    let result = 0;
-
-    const players = await Player.find({});
-    players.forEach(player => {
-        sumAllSuccesRate+=player.successRate;
-    })
-
-    totalPlayers = players.length;
-
-    if(totalPlayers !== 0) {
-        result = sumAllSuccesRate / totalPlayers;
+        return winner;
+    } catch (error) {
+        throw error;
     }
-
-    return result;
-}
+};
