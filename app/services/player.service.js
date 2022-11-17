@@ -1,5 +1,7 @@
 import { Player } from "../models/Player.js";
+import bcrypt from "bcrypt";
 import { duplicatePlayerName } from "../validators/player.validators.js";
+import { getPlayerById } from "../helpers/helpers.js";
 
 export const getAllPlayers = async () => {
     try {
@@ -21,6 +23,9 @@ export const addPlayer = async (name, password) => {
         //res.status(422).json({ error: "Name duplicate!" });
     }
 
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
     if (name === "") {
         name = "ANÒNIM";
     }
@@ -28,7 +33,7 @@ export const addPlayer = async (name, password) => {
     try {
         const newPlayer = await Player.create({
             name,
-            password
+            password: passwordHash
         });
 
         await newPlayer.save();
@@ -41,12 +46,7 @@ export const addPlayer = async (name, password) => {
 }
 
 export const updatePlayer = async (id, changes) => {
-    const updatedPlayer = await Player.findById(id);
-    if (!updatedPlayer) {
-        const error = new Error("The id does not exist.");
-        error.code = 402;
-        throw error;
-    }
+    const updatedPlayer = await getPlayerById(id);
 
     const existName = await duplicatePlayerName(changes.name);
     if (existName) {
@@ -66,12 +66,7 @@ export const updatePlayer = async (id, changes) => {
 };
 
 export const updateSuccessRate = async(id, newValue) => {
-    const player = await Player.findById(id);
-    if (!player) {
-        const error = new Error("The id does not exist.");
-        error.code = 402;
-        throw error;
-    }
+    const player = await getPlayerById(id);
     
     try {
         player.set("successRate", newValue);
