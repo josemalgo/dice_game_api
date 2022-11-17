@@ -16,4 +16,13 @@ const playerSchema = new Schema({
     timestamps: true
 });
 
+playerSchema.set("toJSON", {
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id;
+        delete returnedObject._id;
+        delete returnedObject.__v;
+        delete returnedObject.password
+    }
+})
+
 export const Player = mongoose.model('Player', playerSchema);

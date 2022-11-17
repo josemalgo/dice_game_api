@@ -1,4 +1,5 @@
 import { Player } from "../models/Player.js";
+import bcrypt from "bcrypt";
 import { duplicatePlayerName } from "../validators/player.validators.js";
 
 export const getAllPlayers = async () => {
@@ -21,6 +22,9 @@ export const addPlayer = async (name, password) => {
         //res.status(422).json({ error: "Name duplicate!" });
     }
 
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
     if (name === "") {
         name = "ANÒNIM";
     }
@@ -28,7 +32,7 @@ export const addPlayer = async (name, password) => {
     try {
         const newPlayer = await Player.create({
             name,
-            password
+            password: passwordHash
         });
 
         await newPlayer.save();

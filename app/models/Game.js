@@ -14,4 +14,12 @@ const gameSchema = new Schema({
     }
 });
 
+gameSchema.set("toJSON", {
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id;
+        delete returnedObject._id;
+        delete returnedObject.__v;
+    }
+})
+
 export const Game = mongoose.model("Game", gameSchema);
