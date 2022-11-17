@@ -2,14 +2,15 @@ import { Player } from "../models/Player.js";
 import * as playerService from "../services/player.service.js"
 import { validationResult } from "express-validator";
 import mongoose from "mongoose";
+import { httpStatusCodes } from "../enums/enums.js";
 
 export const getPlayers = async ( req, res ) => {
 
     try {
         const allPlayers = await playerService.getAllPlayers();
-        res.status( 200 ).json( allPlayers );
+        res.status( httpStatusCodes.OK ).json( allPlayers );
     } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
+        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
     }
 }
 
@@ -18,7 +19,7 @@ export const createPlayer = async ( req, res ) => {
     if ( req.body.name !== "" ) {
         const errors = validationResult( req );
         if ( !errors.isEmpty() ) {
-            return res.status( 422 ).json( { errors: errors.array() } );
+            return res.status( httpStatusCodes.UNPROCESSABLE_ENTITY ).json( { errors: errors.array() } );
         }
     }
 
@@ -28,7 +29,7 @@ export const createPlayer = async ( req, res ) => {
         const player = await playerService.addPlayer( name, password );
         res.status( 201 ).json( player );
     } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
+        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
     }
 }
 
@@ -36,7 +37,7 @@ export const updatePlayer = async ( req, res ) => {
 
     const errors = validationResult( req );
     if ( !errors.isEmpty() ) {
-        return res.status( 400 ).json( { error: errors.array() });
+        return res.status( httpStatusCodes.BAD_REQUEST ).json( { error: errors.array() });
     }
 
     const {
@@ -52,7 +53,7 @@ export const updatePlayer = async ( req, res ) => {
         const player = await playerService.updatePlayer( id, body );
         res.status(201).json( player );
     } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
+        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
     }
 }
 
