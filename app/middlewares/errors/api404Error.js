@@ -1,9 +1,9 @@
-import { httpStatusCodes } from "../enums/enums.js";
-import { BaseError } from "./BaseError.js";
+import { httpStatusCodes } from "../../enums/enums.js"
+import { BaseError } from "./baseError.js"
 
-export class Api404Error extends BaseError {
+class Api404Error extends BaseError {
     constructor(
-        name, 
+        name,
         statusCode = httpStatusCodes.NOT_FOUND,
         description = "Not found.",
         isOperational = true
@@ -11,3 +11,5 @@ export class Api404Error extends BaseError {
         super(name, statusCode, isOperational, description)
     }
 }
+
+export default Api404Error

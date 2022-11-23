@@ -1,0 +1,16 @@
+import { httpStatusCodes } from "../../enums/enums.js"
+import { BaseError } from "./baseError.js"
+
+class Api400Error extends BaseError {
+    constructor(
+        name,
+        statusCode = httpStatusCodes.BAD_REQUEST,
+        description = "Bad request.",
+        isOperational = true
+    ) {
+        super(name, statusCode, isOperational, description)
+
+    }
+}
+
+export default Api400Error
