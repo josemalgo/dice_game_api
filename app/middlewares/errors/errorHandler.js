@@ -1,4 +1,5 @@
-import { BaseError } from "./baseError"
+import { httpStatusCodes } from "../../enums/httpStatusCodes.js"
+import { BaseError } from "./baseError.js"
 
 const logError = (err, req, res, next) => {
     console.error(err)
@@ -6,16 +7,24 @@ const logError = (err, req, res, next) => {
 }
 
 const errorResponder = (err, req, res, next) => {
-    res.status(err.statusCode).json({ message: err.message})
+    if(!err instanceof BaseError) {
+        next(err)
+    }
+
+    res.status(err.statusCode).json({ message: err.message, name: err.name})
 }
 
-const isOperationalError = (error) => {
-    if(error instanceof BaseError) {
-        return error.isOperational
+const isOperationalError = (err) => {
+    if(err instanceof BaseError) {
+        return err.isOperational
     }
 
     return false
 }
+
+function failSafeHandler(err, req, res, next) {
+    res.status(httpStatusCodes.INTERNAL_SERVER).send({message: err.message})
+  }
 
 const invalidPathHandler = (req, res, next) => {
     res.redirect('/')
@@ -25,5 +34,6 @@ export {
     logError,
     errorResponder,
     isOperationalError,
-    invalidPathHandler
+    invalidPathHandler,
+    failSafeHandler
 }

@@ -2,19 +2,20 @@ import { Player } from "../models/Player.js";
 import * as playerService from "../services/player.service.js"
 import { validationResult } from "express-validator";
 import mongoose from "mongoose";
-import { httpStatusCodes } from "../enums/enums.js";
+import { httpStatusCodes } from "../enums/httpStatusCodes.js";
+import Api400Error from "../middlewares/errors/api400Error.js";
 
-export const getPlayers = async ( req, res ) => {
+export const getPlayers = async ( req, res, next ) => {
 
     try {
         const allPlayers = await playerService.getAllPlayers();
         res.status( httpStatusCodes.OK ).json( allPlayers );
     } catch ( error ) {
-        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
+        next(error)
     }
 }
 
-export const createPlayer = async ( req, res ) => {
+export const createPlayer = async ( req, res, next ) => {
 
     if ( req.body.name !== "" ) {
         const errors = validationResult( req );
@@ -33,7 +34,7 @@ export const createPlayer = async ( req, res ) => {
     }
 }
 
-export const updatePlayer = async ( req, res ) => {
+export const updatePlayer = async ( req, res, next ) => {
 
     const errors = validationResult( req );
     if ( !errors.isEmpty() ) {
@@ -46,7 +47,7 @@ export const updatePlayer = async ( req, res ) => {
     } = req;
 
     if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return res.status( 400 ).json( { error: "Invalid ObjectID" } );
+        throw new Api400Error("Invalid ObjectID")
     }
 
     try {
@@ -57,17 +58,15 @@ export const updatePlayer = async ( req, res ) => {
     }
 }
 
-export const deletePlayer = async ( req, res ) => {
+export const deletePlayer = async ( req, res, next ) => {
     const { id } = req.params;
-
-    if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return res.status( 400 ).json( { error: "Invalid ObjectID" } );
-    }
-
     try {
+        if ( !mongoose.Types.ObjectId.isValid( id ) ) {
+            throw new Api400Error("Invalid ObjectID")
+        }
         await Player.deleteOne( { _id: id } );
         res.status( 200 );
     } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
+        next(error)
     }
 }

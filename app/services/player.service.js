@@ -12,18 +12,13 @@ export const getAllPlayers = async () => {
     } catch (error) {
         throw error;
     }
-    
 }
 
 export const addPlayer = async (name, password) => {
 
     const existName = await duplicatePlayerName(name);
     if (existName) {
-        throw new Api400Error(`Name: ${name} is duplicate.`)
-        const error = new Error("Name duplicate");
-        error.code = 422;
-        throw error;
-        //res.status(422).json({ error: "Name duplicate!" });
+        throw new Api400Error(`Name: ${name} is already in use.`)
     }
 
     const saltRounds = 10;
@@ -50,16 +45,12 @@ export const addPlayer = async (name, password) => {
 
 export const updatePlayer = async (id, changes) => {
     const updatedPlayer = await getPlayerById(id);
-    if (player === null) {
+    if (updatedPlayer === null) {
         throw new Api404Error(`Player with id: ${id} not found.`)
     }
 
     const existName = await duplicatePlayerName(changes.name);
-    if (existName) {
-        const error = new Error("Name duplicate");
-        error.code = 422;
-        throw error;
-    }
+    if (existName) throw new Api400Error(`Name: ${changes.name} is already in use.`)
 
     try {
         updatedPlayer.set(changes);

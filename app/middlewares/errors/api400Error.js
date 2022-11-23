@@ -1,4 +1,4 @@
-import { httpStatusCodes } from "../../enums/enums.js"
+import { httpStatusCodes } from "../../enums/httpStatusCodes.js"
 import { BaseError } from "./baseError.js"
 
 class Api400Error extends BaseError {
