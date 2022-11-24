@@ -7,11 +7,13 @@ const logError = (err, req, res, next) => {
 }
 
 const errorResponder = (err, req, res, next) => {
-    if(!err instanceof BaseError) {
+   
+    if(err instanceof BaseError) {
+        res.status(err.statusCode).json({ message: err.message, name: err.name})
+    } else {
         next(err)
     }
 
-    res.status(err.statusCode).json({ message: err.message, name: err.name})
 }
 
 const isOperationalError = (err) => {

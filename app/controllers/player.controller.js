@@ -6,13 +6,9 @@ import { httpStatusCodes } from "../enums/httpStatusCodes.js";
 import Api400Error from "../middlewares/errors/api400Error.js";
 
 export const getPlayers = async (req, res, next) => {
-
-    try {
-        const allPlayers = await playerService.getAllPlayers();
+    playerService.getAllPlayers().then(allPlayers => {
         res.status(httpStatusCodes.OK).json(allPlayers);
-    } catch (error) {
-        next(error)
-    }
+    }).catch(error => next(error))
 }
 
 export const createPlayer = async (req, res, next) => {
@@ -20,6 +16,7 @@ export const createPlayer = async (req, res, next) => {
     if (req.body.name !== "") {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            next(new Api400Error(errors.array()))
             return res.status(httpStatusCodes.UNPROCESSABLE_ENTITY).json({ errors: errors.array() });
         }
     }
@@ -27,29 +24,31 @@ export const createPlayer = async (req, res, next) => {
     const { name, password } = req.body;
 
     try {
-        const player = await playerService.addPlayer(name, password);
-        res.status(201).json(player);
+        playerService.addPlayer(name, password).then(player => {
+            res.status(httpStatusCodes.CREATED).json(player);
+        }).catch(error => next(error))
     } catch (error) {
         next(error)
     }
 }
 
 export const updatePlayer = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        next(new Api400Error(errors.array()))
+        //return res.status(httpStatusCodes.BAD_REQUEST).json({ error: errors.array() });
+    }
+
+    const {
+        body,
+        params: { id }
+    } = req;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        throw new Api400Error("Invalid ObjectID")
+    }
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            throw new Api400Error(errors.array())
-            //return res.status(httpStatusCodes.BAD_REQUEST).json({ error: errors.array() });
-        }
-
-        const {
-            body,
-            params: { id }
-        } = req;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            throw new Api400Error("Invalid ObjectID")
-        }
 
         const player = await playerService.updatePlayer(id, body);
         res.status(201).json(player);

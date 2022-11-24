@@ -7,6 +7,7 @@ import Api400Error from "../middlewares/errors/api400Error.js";
 
 export const getAllPlayers = async () => {
     try {
+        throw new Error()
         const allPlayers = await Player.find({}, { name: 1, successRate: 1, games: 1 });
         return allPlayers;    
     } catch (error) {
