@@ -7,29 +7,25 @@ import Api400Error from "../middlewares/errors/api400Error.js";
 
 export const getAllPlayers = async () => {
     try {
-        throw new Error()
         const allPlayers = await Player.find({}, { name: 1, successRate: 1, games: 1 });
-        return allPlayers;    
+        return allPlayers;
     } catch (error) {
         throw error;
     }
 }
 
 export const addPlayer = async (name, password) => {
-
-    const existName = await duplicatePlayerName(name);
-    if (existName) {
-        throw new Api400Error(`Name: ${name} is already in use.`)
-    }
-
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-
-    if (name === "") {
-        name = "ANÒNIM";
-    }
-
     try {
+        const existName = await duplicatePlayerName(name);
+        if (existName) {
+            throw new Api400Error(`Name: ${name} is already in use.`)
+        }
+
+        if (name === "") {
+            name = "ANÒNIM";
+        }
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(password, saltRounds);
         const newPlayer = await Player.create({
             name,
             password: passwordHash
@@ -41,7 +37,6 @@ export const addPlayer = async (name, password) => {
     } catch (error) {
         throw error;
     }
-
 }
 
 export const updatePlayer = async (id, changes) => {
@@ -61,14 +56,14 @@ export const updatePlayer = async (id, changes) => {
         throw error;
     }
 
-};
+}
 
-export const updateSuccessRate = async(id, newValue) => {
+export const updateSuccessRate = async (id, newValue) => {
     const player = await getPlayerById(id);
     if (player === null) {
         throw new Api404Error(`Player with id: ${id} not found.`)
     }
-    
+
     try {
         player.set("successRate", newValue);
         await player.save();

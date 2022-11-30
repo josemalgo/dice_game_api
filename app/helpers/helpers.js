@@ -8,4 +8,3 @@ export const getPlayerById = async() => {
         throw error;
     }
 }
-

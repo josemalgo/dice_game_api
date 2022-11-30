@@ -13,11 +13,9 @@ export const playerName = [
 ];
 
 export const duplicatePlayerName = async (name) => {
-
     const existName = await Player.findOne({ name: name })
     if (existName) {
         return true;
     }
-
     return false;
 }
