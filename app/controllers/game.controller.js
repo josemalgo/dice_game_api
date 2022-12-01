@@ -1,28 +1,26 @@
 import mongoose from "mongoose";
 import { validationResult } from "express-validator";
 import * as gameService from "../services/game.service.js";
-import { Game } from "../models/Game.js";
+import Api400Error from "../middlewares/errors/api400Error.js";
+import { httpStatusCodes } from "../enums/httpStatusCodes.js";
+import { isValidMongooseId } from "../helpers/helpers.js"
 
-export const getGames = async ( req, res ) => {
-    
+export const getGames = ( req, res ) => {
     const {id} = req.params;
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status( 422 ).json( { error: "Invalid ObjectID" } );
-    }
+    // if(!mongoose.Types.ObjectId.isValid(id)) {
+    //     return next(new Api400Error("Invalid ObjectID"))
+    // }
 
-    try {
-        const games = await gameService.getGamesByPlayerId(id)
-        res.status(200).json(games);    
-    } catch (error) {
-        return res.status( 500 ).json( { message: error.message } );
-    }
+    isValidMongooseId(id)
+    gameService.getGamesByPlayerId(id).then(games => {
+        res.status(httpStatusCodes.OK).json(games)
+    }).catch(error => next(error))
 }
 
-export const addGame = async ( req, res ) => {
-
+export const addGame = ( req, res ) => {
     const errors = validationResult( req );
     if ( !errors.isEmpty() ) {
-        res.status( 402 ).json( { errors: errors.array() } );
+        return next(new Api400Error(errors.array()))
     }
 
     const {
@@ -31,30 +29,22 @@ export const addGame = async ( req, res ) => {
     } = req;
 
     if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return res.status( 422 ).json( { error: "Invalid ObjectID" } );
+        return next(new Api400Error("Invalid ObjectID"))
     }
 
-    try {
-        const game = await gameService.addGame( id, roll );
-        res.status( 201 ).json( game );
-    } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
-    }
-
+    gameService.addGame(id, roll).then(game => {
+        res.status(httpStatusCodes.OK).json(game)
+    }).catch(error => next(error))
 }
 
-export const deleteGames = async ( req, res ) => {
+export const deleteGames = ( req, res ) => {
     const { id } = req.params;
-
     if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return res.status( 422 ).json( { error: "Invalid ObjectID" } );
+        return next(new Api400Error("Invalid ObjectID"))
     }
 
-    try {
-        const gamesDeleted = await gameService.deleteGames( id );
+    gameService.deleteGames(id).then(async () => {
         await play.save()
-        res.status( 200 ).json(gamesDeleted);
-    } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
-    }
+        res.status(httpStatusCodes.OK).end()
+    }).catch(error => next(error))
 }

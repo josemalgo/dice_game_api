@@ -55,16 +55,11 @@ export const updatePlayer = async (id, changes) => {
     } catch (error) {
         throw error;
     }
-
 }
 
 export const updateSuccessRate = async (id, newValue) => {
-    const player = await getPlayerById(id);
-    if (player === null) {
-        throw new Api404Error(`Player with id: ${id} not found.`)
-    }
-
     try {
+        const player = await getPlayerById(id);
         player.set("successRate", newValue);
         await player.save();
     } catch (error) {

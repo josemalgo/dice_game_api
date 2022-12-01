@@ -2,7 +2,6 @@ import { Game } from "../models/Game.js";
 import { Player } from "../models/Player.js";
 import { updateSuccessRate } from "./player.service.js";
 
-
 export const getGamesByPlayerId = async (id) => {
     try {
         const games = await Game.find({player: id}, {_id: 0, player: 0, __v: 0});
@@ -10,7 +9,6 @@ export const getGamesByPlayerId = async (id) => {
     } catch (error) {
         throw error;
     }
-    
 }
 
 export const addGame = async (id, roll) => {

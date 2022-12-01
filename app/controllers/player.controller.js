@@ -4,8 +4,10 @@ import { validationResult } from "express-validator";
 import mongoose from "mongoose";
 import { httpStatusCodes } from "../enums/httpStatusCodes.js";
 import Api400Error from "../middlewares/errors/api400Error.js";
+import { isValidMongooseId } from "../helpers/helpers.js";
 
 export const getPlayers = (req, res, next) => {
+    isValidMongooseId("12312");
     playerService.getAllPlayers().then(allPlayers => {
         res.status(httpStatusCodes.OK).json(allPlayers);
     }).catch(error => next(error))
@@ -26,7 +28,7 @@ export const createPlayer = (req, res, next) => {
     }).catch(error => next(error))
 }
 
-export const updatePlayer = async (req, res, next) => {
+export const updatePlayer = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return next(new Api400Error(errors.array()))
