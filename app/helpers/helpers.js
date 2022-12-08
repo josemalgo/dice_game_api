@@ -15,7 +15,6 @@ export const isValidMongooseId = (id) => {
     if(!mongoose.Types.ObjectId.isValid(id)) {
         throw new Api400Error("Invalid ObjectID")
     }
-    return
 }
 
 export const validateRequest = (req) => {
@@ -23,7 +22,6 @@ export const validateRequest = (req) => {
     if (!errors.isEmpty()) {
         throw new Api400Error(errors.array())
     }
-    return 
 }
 
 export const isValidPlayerName = async(name) => {
@@ -31,6 +29,5 @@ export const isValidPlayerName = async(name) => {
     if (existName) {
         throw new Api400Error(`Name: ${name} is already in use.`)
     }
-    return
 }
 
