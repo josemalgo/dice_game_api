@@ -7,10 +7,9 @@ import Api400Error from "../middlewares/errors/api400Error.js";
 import { isValidMongooseId } from "../helpers/helpers.js";
 
 export const getPlayers = (req, res, next) => {
-    isValidMongooseId("12312");
     playerService.getAllPlayers().then(allPlayers => {
         res.status(httpStatusCodes.OK).json(allPlayers);
-    }).catch(error => next(error))
+    }).catch(next)
 }
 
 export const createPlayer = (req, res, next) => {
