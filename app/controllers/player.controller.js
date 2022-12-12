@@ -38,9 +38,7 @@ export const updatePlayer = (req, res, next) => {
         params: { id }
     } = req;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return next(new Api400Error("Invalid ObjectID"))
-    }
+    isValidMongooseId(id)
 
     playerService.updatePlayer(id, body).then(updatedPlayer => {
         res.status(httpStatusCodes.CREATED).json(updatedPlayer)
@@ -49,10 +47,7 @@ export const updatePlayer = (req, res, next) => {
 
 export const deletePlayer = (req, res, next) => {
     const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return next(new Api400Error("Invalid ObjectID"))
-    }
+    isValidMongooseId(id)
 
     Player.deleteOne({ _id: id }).then(() => {
         res.status(httpStatusCodes.OK).end();

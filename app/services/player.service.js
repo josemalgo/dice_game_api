@@ -1,8 +1,6 @@
 import { Player } from "../models/Player.js";
 import bcrypt from "bcrypt";
-import { duplicatePlayerName } from "../validators/player.validators.js";
 import { getPlayerById, isValidPlayerName } from "../helpers/helpers.js";
-import Api400Error from "../middlewares/errors/api400Error.js";
 
 export const getAllPlayers = async () => {
     const allPlayers = await Player.find({}, { name: 1, successRate: 1, games: 1 });
@@ -28,8 +26,7 @@ export const addPlayer = async (name, password) => {
 
 export const updatePlayer = async (id, changes) => {
     const updatedPlayer = await getPlayerById(id);
-    const existName = await duplicatePlayerName(changes.name);
-    if (existName) throw new Api400Error(`Name: ${changes.name} is already in use.`)
+    await isValidPlayerName(changes.name)
 
     updatedPlayer.set(changes);
     await updatedPlayer.save();
