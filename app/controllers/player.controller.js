@@ -1,7 +1,6 @@
 import { Player } from "../models/Player.js";
 import * as playerService from "../services/player.service.js"
 import { validationResult } from "express-validator";
-import mongoose from "mongoose";
 import { httpStatusCodes } from "../enums/httpStatusCodes.js";
 import Api400Error from "../middlewares/errors/api400Error.js";
 import { isValidMongooseId } from "../helpers/helpers.js";

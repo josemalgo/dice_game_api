@@ -1,42 +1,27 @@
+import { getPlayerById } from "../helpers/helpers.js";
+import Api404Error from "../middlewares/errors/api404Error.js";
 import { Game } from "../models/Game.js";
-import { Player } from "../models/Player.js";
 import { updateSuccessRate } from "./player.service.js";
 
 export const getGamesByPlayerId = async (id) => {
-    try {
-        const games = await Game.find({player: id}, {_id: 0, player: 0, __v: 0});
-        return games;
-    } catch (error) {
-        throw error;
-    }
+    const games = await Game.find({ player: id }, { _id: 0, player: 0, __v: 0 });
+    return games;
 }
 
 export const addGame = async (id, roll) => {
-    const player = await Player.findById(id)
-    if (!player) {
-        const error = new Error();
-        error.code = 422;
-        throw error;
-    }
-
+    const player = await getPlayerById(id)
     const win = winGame(roll);
+    const newGame = await Game.create({
+        player: player._id,
+        roll,
+        win
+    });
 
-    try {
-        const newGame = await Game.create({
-            player: player._id,
-            roll,
-            win
-        });
+    await newGame.save();
+    const successRate = await calculateSuccesRate(id);
+    await updateSuccessRate(id, successRate);
 
-        await newGame.save();
-        const successRate = await calculateSuccesRate(id);
-        await updateSuccessRate(id, successRate);
-
-        return newGame;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
+    return newGame;
 };
 
 const winGame = (roll) => {
@@ -51,12 +36,12 @@ const winGame = (roll) => {
 
 export const deleteGames = async (id) => {
     try {
-        const gamesDeleted = await Game.deleteMany({player: id}); 
+        const gamesDeleted = await Game.deleteMany({ player: id });
         await calculateSuccesRate(id);
         return gamesDeleted;
     } catch (error) {
         throw error;
-    } 
+    }
 };
 
 
@@ -65,14 +50,17 @@ const calculateSuccesRate = async (id) => {
     let totalGames = 0;
     let successRate = 0;
 
-    const games = await Game.find({player: id});
+    const games = await Game.find({ player: id });
+    if (!games) {
+        throw new Api404Error(`Not found games for player with id: ${id}`)
+    }
     games.forEach(game => {
         if (game.win) totalWin++;
     });
 
     totalGames = games.length;
 
-    if(totalGames !== 0) {
+    if (totalGames !== 0) {
         successRate = totalWin / totalGames * 100
     }
 

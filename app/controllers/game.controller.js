@@ -7,10 +7,6 @@ import { isValidMongooseId } from "../helpers/helpers.js"
 
 export const getGames = ( req, res ) => {
     const {id} = req.params;
-    // if(!mongoose.Types.ObjectId.isValid(id)) {
-    //     return next(new Api400Error("Invalid ObjectID"))
-    // }
-
     isValidMongooseId(id)
     gameService.getGamesByPlayerId(id).then(games => {
         res.status(httpStatusCodes.OK).json(games)
