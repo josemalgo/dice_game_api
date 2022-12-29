@@ -31,3 +31,6 @@ export const isValidPlayerName = async(name) => {
     }
 }
 
+export const promiseWrapController = () => {
+    // Promise.resolve()
+}

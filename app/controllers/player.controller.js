@@ -23,7 +23,7 @@ export const createPlayer = (req, res, next) => {
 
     playerService.addPlayer(name, password).then(player => {
         res.status(httpStatusCodes.CREATED).json(player);
-    }).catch(error => next(error))
+    }).catch(next)
 }
 
 export const updatePlayer = (req, res, next) => {
@@ -41,7 +41,7 @@ export const updatePlayer = (req, res, next) => {
 
     playerService.updatePlayer(id, body).then(updatedPlayer => {
         res.status(httpStatusCodes.CREATED).json(updatedPlayer)
-    }).catch(error => next(error))
+    }).catch(next)
 }
 
 export const deletePlayer = (req, res, next) => {
@@ -50,5 +50,5 @@ export const deletePlayer = (req, res, next) => {
 
     Player.deleteOne({ _id: id }).then(() => {
         res.status(httpStatusCodes.OK).end();
-    }).catch(error => next(error))
+    }).catch(next)
 }
