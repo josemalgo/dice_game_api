@@ -3,44 +3,34 @@ import { validationResult } from "express-validator";
 import * as gameService from "../services/game.service.js";
 import Api400Error from "../middlewares/errors/api400Error.js";
 import { httpStatusCodes } from "../enums/httpStatusCodes.js";
-import { isValidMongooseId } from "../helpers/helpers.js"
+import { isValidMongooseId, validateRequest } from "../helpers/helpers.js"
 
-export const getGames = ( req, res ) => {
-    const {id} = req.params;
+export const getGames = async ( req, res, next ) => {
+    const {id} = req.params
     isValidMongooseId(id)
-    gameService.getGamesByPlayerId(id).then(games => {
-        res.status(httpStatusCodes.OK).json(games)
-    }).catch(error => next(error))
+
+    const games = gameService.getGamesByPlayerId(id)
+    res.status(httpStatusCodes.OK).json(games)
 }
 
-export const addGame = ( req, res ) => {
-    const errors = validationResult( req );
-    if ( !errors.isEmpty() ) {
-        return next(new Api400Error(errors.array()))
-    }
-
+export const addGame = async ( req, res, next ) => {
+    validateRequest(req)
     const {
         body: { roll },
         params: { id }
     } = req;
 
-    if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return next(new Api400Error("Invalid ObjectID"))
-    }
+    isValidMongooseId(id)
 
-    gameService.addGame(id, roll).then(game => {
-        res.status(httpStatusCodes.OK).json(game)
-    }).catch(error => next(error))
+    const game = await gameService.addGame(id, roll)
+    res.status(httpStatusCodes.OK).json(game)
 }
 
-export const deleteGames = ( req, res ) => {
+export const deleteGames = async ( req, res, next ) => {
     const { id } = req.params;
-    if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return next(new Api400Error("Invalid ObjectID"))
-    }
+    isValidMongooseId(id)
 
-    gameService.deleteGames(id).then(async () => {
-        await play.save()
-        res.status(httpStatusCodes.OK).end()
-    }).catch(error => next(error))
+    const gamesDeleted = await gameService.deleteGames(id)
+    //await play.save()
+    res.status(httpStatusCodes.OK).end()
 }

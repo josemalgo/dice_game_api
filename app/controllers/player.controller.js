@@ -1,37 +1,25 @@
-import { Player } from "../models/Player.js";
 import * as playerService from "../services/player.service.js"
-import { validationResult } from "express-validator";
 import { httpStatusCodes } from "../enums/httpStatusCodes.js";
-import Api400Error from "../middlewares/errors/api400Error.js";
-import { isValidMongooseId } from "../helpers/helpers.js";
+import { isValidMongooseId, validateRequest } from "../helpers/helpers.js";
 
-export const getPlayers = (req, res, next) => {
-    playerService.getAllPlayers().then(allPlayers => {
-        res.status(httpStatusCodes.OK).json(allPlayers);
-    }).catch(next)
+export const getPlayers = async (_req, res, next) => {
+    const allPlayers = await playerService.getAllPlayers();
+    res.status(httpStatusCodes.OK).json(allPlayers);
 }
 
-export const createPlayer = (req, res, next) => {
+export const createPlayer = async (req, res, next) => {
     if (req.body.name !== "") {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return next(new Api400Error(errors.array()))
-        }
+        validateRequest(req)
     }
 
     const { name, password } = req.body;
 
-    playerService.addPlayer(name, password).then(player => {
-        res.status(httpStatusCodes.CREATED).json(player);
-    }).catch(next)
+    const player = await playerService.addPlayer(name, password)
+    res.status(httpStatusCodes.CREATED).json(player);
 }
 
-export const updatePlayer = (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return next(new Api400Error(errors.array()))
-    }
-
+export const updatePlayer = async (req, res, next) => {
+    validateRequest(req)
     const {
         body,
         params: { id }
@@ -39,16 +27,14 @@ export const updatePlayer = (req, res, next) => {
 
     isValidMongooseId(id)
 
-    playerService.updatePlayer(id, body).then(updatedPlayer => {
-        res.status(httpStatusCodes.CREATED).json(updatedPlayer)
-    }).catch(next)
+    const updatedPlayer = await playerService.updatePlayer(id, body)
+    res.status(httpStatusCodes.CREATED).json(updatedPlayer)
 }
 
-export const deletePlayer = (req, res, next) => {
+export const deletePlayer = async (req, res, next) => {
     const { id } = req.params;
     isValidMongooseId(id)
 
-    Player.deleteOne({ _id: id }).then(() => {
-        res.status(httpStatusCodes.OK).end();
-    }).catch(next)
+    await playerService.deletePlayer(id)
+    res.status(httpStatusCodes.OK).end();
 }

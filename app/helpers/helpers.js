@@ -2,6 +2,7 @@ import { Player } from "../models/Player.js";
 import Api404Error from "../middlewares/errors/api404Error.js";
 import mongoose from "mongoose";
 import Api400Error from "../middlewares/errors/api400Error.js";
+import { validationResult } from "express-validator";
 
 export const getPlayerById = async(id) => {
     const player = await Player.findById(id);
@@ -31,6 +32,12 @@ export const isValidPlayerName = async(name) => {
     }
 }
 
-export const promiseWrapController = () => {
-    // Promise.resolve()
+export const duplicatePlayerName = async (name) => {
+    const existName = await Player.findOne({ name: name })
+    if (existName) {
+        return true;
+    }
+    return false;
 }
+
+export const wrapAsync = fn => (req, res, next) => fn(req, res, next).catch(next);

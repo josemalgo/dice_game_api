@@ -35,13 +35,9 @@ const winGame = (roll) => {
 
 
 export const deleteGames = async (id) => {
-    try {
-        const gamesDeleted = await Game.deleteMany({ player: id });
-        await calculateSuccesRate(id);
-        return gamesDeleted;
-    } catch (error) {
-        throw error;
-    }
+    const gamesDeleted = await Game.deleteMany({ player: id });
+    await calculateSuccesRate(id);
+    return gamesDeleted;
 };
 
 

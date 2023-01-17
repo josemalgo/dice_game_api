@@ -33,6 +33,10 @@ export const updatePlayer = async (id, changes) => {
     return updatedPlayer;
 }
 
+export const deletePlayer = async (id) => {
+    await Player.deleteOne({_id: id})
+}
+
 export const updateSuccessRate = async (id, newValue) => {
     const player = await getPlayerById(id);
     player.set("successRate", newValue);
