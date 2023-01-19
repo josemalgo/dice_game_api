@@ -9,10 +9,7 @@ export const getAllPlayers = async () => {
 
 export const addPlayer = async (name, password) => {
     await isValidPlayerName(name)
-
-    if (name === "") {
-        name = "ANÒNIM";
-    }
+    
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
     const newPlayer = await Player.create({

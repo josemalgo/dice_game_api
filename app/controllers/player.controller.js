@@ -8,10 +8,11 @@ export const getPlayers = async (_req, res, next) => {
 }
 
 export const createPlayer = async (req, res, next) => {
-    if (req.body.name !== "") {
-        validateRequest(req)
+    if (req.body.name === "") {
+        req.body.password = "ANÒNIM"
     }
 
+    validateRequest(req)
     const { name, password } = req.body;
 
     const player = await playerService.addPlayer(name, password)
