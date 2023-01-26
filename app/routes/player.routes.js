@@ -1,11 +1,12 @@
 import { Router } from "express";
 import * as playerController from "../controllers/player.controller.js";
+import { wrapAsync } from "../helpers/helpers.js";
 import * as  playerValidator from "../validators/player.validators.js"
 const router = Router();
 
-router.get("/players", playerController.getPlayers);
-router.post("/players", playerValidator.playerName, playerController.createPlayer);
-router.put("/players/:id", playerValidator.playerName, playerController.updatePlayer);
-router.delete("/players/:id", playerController.deletePlayer);
+router.get("/players", wrapAsync(playerController.getPlayers));
+router.post("/players", playerValidator.playerName, wrapAsync(playerController.createPlayer));
+router.put("/players/:id", playerValidator.playerName, wrapAsync(playerController.updatePlayer));
+router.delete("/players/:id", wrapAsync(playerController.deletePlayer));
 
 export default router;

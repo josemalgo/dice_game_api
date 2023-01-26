@@ -1,73 +1,37 @@
-import { Player } from "../models/Player.js";
 import * as playerService from "../services/player.service.js"
-import { validationResult } from "express-validator";
-import mongoose from "mongoose";
-import { httpStatusCodes } from "../enums/enums.js";
+import { httpStatusCodes } from "../enums/httpStatusCodes.js";
+import { isValidMongooseId, validateRequest } from "../helpers/helpers.js";
 
-export const getPlayers = async ( req, res ) => {
-
-    try {
-        const allPlayers = await playerService.getAllPlayers();
-        res.status( httpStatusCodes.OK ).json( allPlayers );
-    } catch ( error ) {
-        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
-    }
+export const getPlayers = async (_req, res, next) => {
+    const allPlayers = await playerService.getAllPlayers();
+    res.status(httpStatusCodes.OK).json(allPlayers);
 }
 
-export const createPlayer = async ( req, res ) => {
-
-    if ( req.body.name !== "" ) {
-        const errors = validationResult( req );
-        if ( !errors.isEmpty() ) {
-            return res.status( httpStatusCodes.UNPROCESSABLE_ENTITY ).json( { errors: errors.array() } );
-        }
-    }
-
+export const createPlayer = async (req, res, next) => {
+    validateRequest(req)
     const { name, password } = req.body;
 
-    try {
-        const player = await playerService.addPlayer( name, password );
-        res.status( 201 ).json( player );
-    } catch ( error ) {
-        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
-    }
+    const player = await playerService.addPlayer(name, password)
+    res.status(httpStatusCodes.CREATED).json(player);
 }
 
-export const updatePlayer = async ( req, res ) => {
-
-    const errors = validationResult( req );
-    if ( !errors.isEmpty() ) {
-        return res.status( httpStatusCodes.BAD_REQUEST ).json( { error: errors.array() });
-    }
-
+export const updatePlayer = async (req, res, next) => {
+    validateRequest(req)
     const {
         body,
         params: { id }
     } = req;
 
-    if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return res.status( 400 ).json( { error: "Invalid ObjectID" } );
-    }
+    isValidMongooseId(id)
 
-    try {
-        const player = await playerService.updatePlayer( id, body );
-        res.status(201).json( player );
-    } catch ( error ) {
-        return res.status( httpStatusCodes.INTERNAL_SERVER ).json( { message: error.message } );
-    }
+    const updatedPlayer = await playerService.updatePlayer(id, body)
+    res.status(httpStatusCodes.CREATED).json(updatedPlayer)
 }
 
-export const deletePlayer = async ( req, res ) => {
+export const deletePlayer = async (req, res, next) => {
     const { id } = req.params;
+    isValidMongooseId(id)
 
-    if ( !mongoose.Types.ObjectId.isValid( id ) ) {
-        return res.status( 400 ).json( { error: "Invalid ObjectID" } );
-    }
-
-    try {
-        await Player.deleteOne( { _id: id } );
-        res.status( 200 );
-    } catch ( error ) {
-        return res.status( 500 ).json( { message: error.message } );
-    }
+    await playerService.deletePlayer(id)
+    res.status(httpStatusCodes.OK).end();
 }

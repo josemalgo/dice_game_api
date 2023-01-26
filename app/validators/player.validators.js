@@ -1,5 +1,4 @@
 import { check } from "express-validator";
-import { Player } from "../models/Player.js";
 
 export const playerName = [
     check("name")
@@ -8,16 +7,12 @@ export const playerName = [
         .not()
         .isEmpty()
         .isString()
-        //.isAlphanumeric()
-        .matches("^[a-zA-Z\u00C0-\u00FF]*$")
+        .matches("^[a-zA-Z\u00C0-\u00FF]*$"),
+    check("password")
+        .trim()
+        .not()
+        .isEmpty()
+        .withMessage("pass not empty")
+        .isString()
+        //.matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, "i")
 ];
-
-export const duplicatePlayerName = async (name) => {
-
-    const existName = await Player.findOne({ name: name })
-    if (existName) {
-        return true;
-    }
-
-    return false;
-}

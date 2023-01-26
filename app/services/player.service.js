@@ -1,77 +1,41 @@
 import { Player } from "../models/Player.js";
 import bcrypt from "bcrypt";
-import { duplicatePlayerName } from "../validators/player.validators.js";
-import { getPlayerById } from "../helpers/helpers.js";
+import { getPlayerById, isValidPlayerName } from "../helpers/helpers.js";
 
 export const getAllPlayers = async () => {
-    try {
-        const allPlayers = await Player.find({}, { name: 1, successRate: 1, games: 1 });
-        return allPlayers;    
-    } catch (error) {
-        throw error;
-    }
-    
+    const allPlayers = await Player.find({}, { name: 1, successRate: 1, games: 1 });
+    return allPlayers;
 }
 
 export const addPlayer = async (name, password) => {
-
-    const existName = await duplicatePlayerName(name);
-    if (existName) {
-        const error = new Error("Name duplicate");
-        error.code = 422;
-        throw error;
-        //res.status(422).json({ error: "Name duplicate!" });
-    }
-
+    await isValidPlayerName(name)
+    
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
+    const newPlayer = await Player.create({
+        name,
+        password: passwordHash
+    });
 
-    if (name === "") {
-        name = "ANÒNIM";
-    }
-
-    try {
-        const newPlayer = await Player.create({
-            name,
-            password: passwordHash
-        });
-
-        await newPlayer.save();
-        return newPlayer;
-
-    } catch (error) {
-        throw error;
-    }
-
+    await newPlayer.save();
+    return newPlayer;
 }
 
 export const updatePlayer = async (id, changes) => {
     const updatedPlayer = await getPlayerById(id);
+    await isValidPlayerName(changes.name)
 
-    const existName = await duplicatePlayerName(changes.name);
-    if (existName) {
-        const error = new Error("Name duplicate");
-        error.code = 422;
-        throw error;
-    }
+    updatedPlayer.set(changes);
+    await updatedPlayer.save();
+    return updatedPlayer;
+}
 
-    try {
-        updatedPlayer.set(changes);
-        await updatedPlayer.save();
-        return updatedPlayer;
-    } catch (error) {
-        throw error;
-    }
+export const deletePlayer = async (id) => {
+    await Player.deleteOne({_id: id})
+}
 
-};
-
-export const updateSuccessRate = async(id, newValue) => {
+export const updateSuccessRate = async (id, newValue) => {
     const player = await getPlayerById(id);
-    
-    try {
-        player.set("successRate", newValue);
-        await player.save();
-    } catch (error) {
-        throw error;
-    }
+    player.set("successRate", newValue);
+    await player.save();
 };
