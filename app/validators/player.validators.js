@@ -7,7 +7,6 @@ export const playerName = [
         .not()
         .isEmpty()
         .isString()
-        //.isAlphanumeric()
         .matches("^[a-zA-Z\u00C0-\u00FF]*$"),
     check("password")
         .trim()

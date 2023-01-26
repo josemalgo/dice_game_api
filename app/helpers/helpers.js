@@ -26,6 +26,8 @@ export const validateRequest = (req) => {
 }
 
 export const isValidPlayerName = async(name) => {
+    if(name === 'ANÒNIM') return
+    
     const existName = await duplicatePlayerName(name);
     if (existName) {
         throw new Api400Error(`Name: ${name} is already in use.`)
