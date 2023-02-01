@@ -7,7 +7,7 @@ export const authenticateToken = (req, res, next) => {
     if(!token || !decodedToken.id) {
         next(new Api401Error("Token missing or invalid"))
     }
-    req.id = decodedToken.id
+    req.playerId = decodedToken.id
     next() 
 }
 
