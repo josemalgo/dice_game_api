@@ -1,4 +1,4 @@
-import { validateRequest } from "../helpers/helpers"
+import { validateRequest } from "../helpers/helpers.js"
 import * as loginService from "../services/login.service.js"
 
 export const validateUser = async (req, res, next) => {

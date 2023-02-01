@@ -1,7 +1,6 @@
-import { duplicatePlayerName } from "../helpers/helpers"
-import { Player } from "../models/Player"
+import { Player } from "../models/Player.js"
 import bcrypt from "bcrypt"
-import Api401Error from "../middlewares/errors/api401Error"
+import Api401Error from "../middlewares/errors/api401Error.js"
 import jwt from "jsonwebtoken"
 
 export const loginPlayer = async (name, password) => {
@@ -15,9 +14,10 @@ export const loginPlayer = async (name, password) => {
     }
 
     const userForToken = {
+        id: player._id,
         name: player.name
     }
 
-    const token = jwt.sign(userForToken, process.env.SECRETKEY)      
-
+    const token = jwt.sign(userForToken, process.env.SECRETKEY)
+    return token;
 }
