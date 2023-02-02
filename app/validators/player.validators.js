@@ -1,6 +1,6 @@
 import { check } from "express-validator";
 
-export const playerName = [
+export const validatePlayer = [
     check("name")
         .trim()
         .escape()
