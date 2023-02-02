@@ -13,7 +13,7 @@ export const authenticateToken = (req, res, next) => {
 
 const getToken = req => {
     const authorization = req.get('authorization')
-    if(authorization === null && authorization.toLowerCase().startWith("bearer ")) {
+    if(authorization !== null && authorization.toLowerCase().startsWith("bearer ")) {
         return authorization.substring(7)
     }
     return null

@@ -10,3 +10,7 @@ export const mongoConfig = {
 export const serverConfig = {
     PORT: process.env.PORT
 }
+
+export const JWTSecretKey = {
+    SECRETKEY: process.env.SECRETKEY
+}

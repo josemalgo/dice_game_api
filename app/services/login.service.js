@@ -4,10 +4,10 @@ import Api401Error from "../middlewares/errors/api401Error.js"
 import jwt from "jsonwebtoken"
 
 export const loginPlayer = async (name, password) => {
-    const player = await Player.findOne({name})
+    const player = await Player.findOne({name: name})
     const correctPassword = player === null 
         ? false
-        : await bcrypt.compare(password, player.passwordhash)
+        : await bcrypt.compare(password, player.password)
     
     if(!(player && correctPassword)) {
         throw new Api401Error("Invalid user or password.")
@@ -19,5 +19,5 @@ export const loginPlayer = async (name, password) => {
     }
 
     const token = jwt.sign(userForToken, process.env.SECRETKEY)
-    return token;
+    return 'Bearer ' + token;
 }
